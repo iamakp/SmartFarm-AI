@@ -1,5 +1,11 @@
 # SmartFarm AI
 
+## Live Demo
+
+🚀 **Live Application:** https://smartfarm-ai-j8sx.onrender.com
+
+📘 **API Documentation:** https://smartfarm-ai-j8sx.onrender.com/docs
+
 **AI-Based Kharif Rice Yield Prediction, Live Weather Advisory and Historical Field Intelligence System**
 
 SmartFarm AI is a full-stack agricultural decision-support system built using **real historical agricultural data**, machine learning and live weather information.
