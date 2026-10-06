@@ -1,0 +1,84 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# =========================
+# Virtual Environment
+# =========================
+venv/
+.env/
+.venv/
+
+# =========================
+# Environment / Secrets
+# =========================
+.env
+*.env
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# Logs / temp
+# =========================
+*.log
+*.tmp
+*.temp
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Python build
+# =========================
+build/
+dist/
+*.egg-info/
+
+# =========================
+# Local cache
+# =========================
+.cache/
+
+# =========================
+# Large / reproducible raw data
+# =========================
+data/raw/
+
+# =========================
+# Optional generated outputs
+# =========================
+*.zip
+
+# =========================
+# Generated processed data
+# Keep only runtime files
+# =========================
+data/processed/*
+
+!data/processed/rice_with_weather.csv
+!data/processed/district_coordinates_complete.csv
+
+
+# =========================
+# Trained models
+# Keep only deployed model
+# =========================
+models/*
+
+!models/kharif_rice_yield_model.joblib

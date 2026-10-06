@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartFarm AI | Operations Console</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand-block">
+        <div class="brand-mark">SF</div>
+        <div>
+          <div class="brand-title">SmartFarm AI</div>
+          <div class="brand-sub">Yield Intelligence</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active" data-view="yieldView">
+          <span>▦</span><span>Yield Console</span>
+        </button>
+        <button class="nav-item" data-view="weatherView">
+          <span>◫</span><span>Weather Advisory</span>
+        </button>
+        <button class="nav-item" data-view="insightsView">
+          <span>◎</span><span>Field Insights</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-meta">
+        <div class="meta-label">MODEL SCOPE</div>
+        <div class="meta-row"><span>Crop</span><strong>Rice</strong></div>
+        <div class="meta-row"><span>Season</span><strong>Kharif</strong></div>
+        <div class="meta-row"><span>Model period</span><strong>1997–2015</strong></div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div>
+          <div class="crumb" id="pageCrumb">OPERATIONS / YIELD PREDICTION</div>
+          <h1 id="pageTitle">Yield Operations Console</h1>
+        </div>
+
+        <div class="topbar-right">
+          <div class="api-status" id="apiStatus">
+            <span class="dot"></span>
+            <div><small>BACKEND</small><strong>Checking</strong></div>
+          </div>
+          <div class="env-badge">LOCAL</div>
+        </div>
+      </header>
+
+      <main class="content">
+
+        <!-- ===================================================== -->
+        <!-- YIELD VIEW -->
+        <!-- ===================================================== -->
+        <section id="yieldView" class="view active-view">
+          <section class="overview-grid">
+            <div class="overview-card">
+              <span class="overview-label">MODEL</span>
+              <strong>Kharif Rice RF</strong>
+              <small>Random Forest regression pipeline</small>
+            </div>
+            <div class="overview-card">
+              <span class="overview-label">MAE</span>
+              <strong>0.3927</strong>
+              <small>tonnes / hectare</small>
+            </div>
+            <div class="overview-card">
+              <span class="overview-label">RMSE</span>
+              <strong>0.6192</strong>
+              <small>tonnes / hectare</small>
+            </div>
+            <div class="overview-card">
+              <span class="overview-label">R²</span>
+              <strong>0.6439</strong>
+              <small>test-set coefficient</small>
+            </div>
+          </section>
+
+          <section class="workspace">
+            <div class="panel input-panel">
+              <div class="panel-head">
+                <div>
+                  <span class="panel-code">INPUT / 01</span>
+                  <h2>Prediction Parameters</h2>
+                </div>
+                <span class="panel-state">REQUIRED</span>
+              </div>
+
+              <form id="predictionForm">
+                <div class="form-row">
+                  <label>
+                    <span>State</span>
+                    <select id="state" required>
+                      <option value="">Select state</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>District</span>
+                    <select id="district" required disabled>
+                      <option value="">Select district</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span>Crop year</span>
+                    <select id="year" required>
+                      <option value="">Select year</option>
+                    </select>
+                    <small>Supported historical period: 1997–2015</small>
+                  </label>
+
+                  <label>
+                    <span>Cultivated area (ha)</span>
+                    <input id="area" type="number" min="0.01" step="0.01" placeholder="199" required>
+                  </label>
+                </div>
+
+                <div class="locked-row">
+                  <div><span>Crop</span><strong>Rice</strong></div>
+                  <div><span>Season</span><strong>Kharif</strong></div>
+                  <div><span>Prediction type</span><strong>Yield + Production</strong></div>
+                </div>
+
+                <button id="predictButton" class="primary-action" type="submit">
+                  <span id="buttonText">Run prediction</span>
+                  <span>→</span>
+                </button>
+
+                <div id="formMessage" class="message hidden"></div>
+              </form>
+            </div>
+
+            <div class="panel output-panel">
+              <div class="panel-head">
+                <div>
+                  <span class="panel-code">OUTPUT / 02</span>
+                  <h2>Prediction Output</h2>
+                </div>
+                <span class="panel-state neutral" id="outputState">IDLE</span>
+              </div>
+
+              <div id="emptyResult" class="empty-state">
+                <strong>No prediction generated</strong>
+                <p>Enter the required parameters and run the model.</p>
+              </div>
+
+              <div id="predictionResult" class="result hidden">
+                <div class="result-location">
+                  <div><span>LOCATION</span><strong id="resultLocation">—</strong></div>
+                  <div><span>YEAR</span><strong id="resultYear">—</strong></div>
+                </div>
+
+                <div class="primary-output">
+                  <div>
+                    <span>PREDICTED YIELD</span>
+                    <strong id="yieldValue">—</strong>
+                    <small>tonnes / hectare</small>
+                  </div>
+                  <div>
+                    <span>EST. PRODUCTION</span>
+                    <strong id="productionValue">—</strong>
+                    <small>tonnes</small>
+                  </div>
+                </div>
+
+                <div class="result-table">
+                  <div class="table-row"><span>Crop</span><strong>Rice</strong></div>
+                  <div class="table-row"><span>Season</span><strong>Kharif</strong></div>
+                  <div class="table-row"><span>Area analysed</span><strong id="resultArea">—</strong></div>
+                  <div class="table-row"><span>Model status</span><strong>Prediction completed</strong></div>
+                </div>
+
+                <div class="warning">
+                  Historical ML estimate. Not a guaranteed field outcome or a live-season forecast.
+                </div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+
+        <!-- ===================================================== -->
+        <!-- WEATHER VIEW -->
+        <!-- ===================================================== -->
+        <section id="weatherView" class="view">
+          <section class="weather-toolbar panel">
+            <div class="panel-head">
+              <div>
+                <span class="panel-code">LIVE WEATHER / LOCATION</span>
+                <h2>Weather Monitoring</h2>
+              </div>
+              <span class="panel-state neutral" id="weatherLoadState">READY</span>
+            </div>
+
+            <div class="three-controls">
+              <label>
+                <span>State</span>
+                <select id="weatherState">
+                  <option value="">Select state</option>
+                </select>
+              </label>
+
+              <label>
+                <span>District</span>
+                <select id="weatherDistrict" disabled>
+                  <option value="">Select district</option>
+                </select>
+              </label>
+
+              <button id="loadWeatherButton" class="secondary-action" type="button">
+                <span>Load live weather</span><span>→</span>
+              </button>
+            </div>
+
+            <div id="weatherMessage" class="message hidden"></div>
+          </section>
+
+          <section id="weatherEmpty" class="module-empty panel">
+            <div>
+              <span class="panel-code">NO LOCATION SELECTED</span>
+              <h2>Weather advisory awaiting location</h2>
+              <p>Select a state and district to load live conditions, rainfall outlook and irrigation guidance.</p>
+            </div>
+          </section>
+
+          <section id="weatherContent" class="hidden">
+            <section class="weather-kpis">
+              <div class="kpi-card"><span>CURRENT TEMP</span><strong id="currentTemp">—</strong><small>°C</small></div>
+              <div class="kpi-card"><span>HUMIDITY</span><strong id="currentHumidity">—</strong><small>%</small></div>
+              <div class="kpi-card"><span>WIND</span><strong id="currentWind">—</strong><small>km/h</small></div>
+              <div class="kpi-card"><span>PRECIPITATION</span><strong id="currentRain">—</strong><small>mm now</small></div>
+            </section>
+
+            <section class="weather-main-grid">
+              <div class="panel irrigation-panel">
+                <div class="panel-head">
+                  <div>
+                    <span class="panel-code">IRRIGATION / ADVISORY</span>
+                    <h2>Weather-Based Signal</h2>
+                  </div>
+                  <span class="panel-state" id="irrigationLevel">—</span>
+                </div>
+
+                <div class="irrigation-body">
+                  <div class="signal-block">
+                    <span>ADVISORY</span>
+                    <p id="irrigationMessage">—</p>
+                  </div>
+
+                  <div class="signal-metrics">
+                    <div><span>Rain next 48h</span><strong id="rain48">—</strong></div>
+                    <div><span>Rain probability</span><strong id="rainProbability">—</strong></div>
+                    <div><span>Reference ET₀</span><strong id="et0">—</strong></div>
+                  </div>
+
+                  <div class="warning">
+                    Advisory is weather-based. Actual irrigation should also consider soil moisture, crop stage and field water conditions.
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel current-panel">
+                <div class="panel-head">
+                  <div>
+                    <span class="panel-code">CURRENT / CONDITIONS</span>
+                    <h2 id="weatherLocation">—</h2>
+                  </div>
+                </div>
+
+                <div class="current-list">
+                  <div><span>Observed time</span><strong id="observedTime">—</strong></div>
+                  <div><span>Feels like</span><strong id="feelsLike">—</strong></div>
+                  <div><span>Weather code</span><strong id="weatherCode">—</strong></div>
+                  <div><span>Data source</span><strong id="weatherSource">—</strong></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel forecast-panel">
+              <div class="panel-head">
+                <div>
+                  <span class="panel-code">FORECAST / 7 DAY</span>
+                  <h2>District Weather Outlook</h2>
+                </div>
+              </div>
+
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Max °C</th>
+                      <th>Min °C</th>
+                      <th>Rain mm</th>
+                      <th>Rain %</th>
+                      <th>ET₀ mm</th>
+                    </tr>
+                  </thead>
+                  <tbody id="forecastBody"></tbody>
+                </table>
+              </div>
+            </section>
+          </section>
+        </section>
+
+
+        <!-- ===================================================== -->
+        <!-- INSIGHTS VIEW -->
+        <!-- ===================================================== -->
+        <section id="insightsView" class="view">
+          <section class="panel insights-toolbar">
+            <div class="panel-head">
+              <div>
+                <span class="panel-code">HISTORICAL ANALYSIS / LOCATION</span>
+                <h2>Field Performance Insights</h2>
+              </div>
+              <span class="panel-state neutral" id="insightsLoadState">READY</span>
+            </div>
+
+            <div class="three-controls">
+              <label>
+                <span>State</span>
+                <select id="insightsState">
+                  <option value="">Select state</option>
+                </select>
+              </label>
+
+              <label>
+                <span>District</span>
+                <select id="insightsDistrict" disabled>
+                  <option value="">Select district</option>
+                </select>
+              </label>
+
+              <button id="loadInsightsButton" class="secondary-action" type="button">
+                <span>Load field insights</span><span>→</span>
+              </button>
+            </div>
+
+            <div id="insightsMessage" class="message hidden"></div>
+          </section>
+
+          <section id="insightsEmpty" class="module-empty panel">
+            <div>
+              <span class="panel-code">NO LOCATION SELECTED</span>
+              <h2>Historical analysis awaiting location</h2>
+              <p>Select a district to compare historical yield performance against its state benchmark.</p>
+            </div>
+          </section>
+
+          <section id="insightsContent" class="hidden">
+
+            <section class="insight-kpis">
+              <div class="kpi-card">
+                <span>AVERAGE YIELD</span>
+                <strong id="insightAverage">—</strong>
+                <small>t / ha</small>
+              </div>
+
+              <div class="kpi-card">
+                <span>BEST YEAR</span>
+                <strong id="insightBestYear">—</strong>
+                <small id="insightBestYield">—</small>
+              </div>
+
+              <div class="kpi-card">
+                <span>WORST YEAR</span>
+                <strong id="insightWorstYear">—</strong>
+                <small id="insightWorstYield">—</small>
+              </div>
+
+              <div class="kpi-card">
+                <span>LATEST RECORD</span>
+                <strong id="insightLatestYear">—</strong>
+                <small id="insightLatestYield">—</small>
+              </div>
+            </section>
+
+            <section class="insight-main-grid">
+              <div class="panel comparison-panel">
+                <div class="panel-head">
+                  <div>
+                    <span class="panel-code">BENCHMARK / STATE COMPARISON</span>
+                    <h2 id="insightLocationTitle">—</h2>
+                  </div>
+                  <span class="panel-state neutral" id="comparisonYear">—</span>
+                </div>
+
+                <div class="comparison-body">
+                  <div class="comparison-row">
+                    <div>
+                      <span>DISTRICT YIELD</span>
+                      <strong id="districtComparisonYield">—</strong>
+                    </div>
+                    <div>
+                      <span>STATE YIELD</span>
+                      <strong id="stateComparisonYield">—</strong>
+                    </div>
+                    <div>
+                      <span>DIFFERENCE</span>
+                      <strong id="comparisonDifference">—</strong>
+                    </div>
+                  </div>
+
+                  <div class="comparison-note" id="comparisonText">—</div>
+                </div>
+              </div>
+
+              <div class="panel latest-panel">
+                <div class="panel-head">
+                  <div>
+                    <span class="panel-code">LATEST / RECORD</span>
+                    <h2>Latest Available District Record</h2>
+                  </div>
+                </div>
+
+                <div class="current-list">
+                  <div><span>Year</span><strong id="latestRecordYear">—</strong></div>
+                  <div><span>Yield</span><strong id="latestRecordYield">—</strong></div>
+                  <div><span>Area</span><strong id="latestRecordArea">—</strong></div>
+                  <div><span>Production</span><strong id="latestRecordProduction">—</strong></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel chart-panel">
+              <div class="panel-head">
+                <div>
+                  <span class="panel-code">TREND / HISTORICAL YIELD</span>
+                  <h2>District vs State Yield Trend</h2>
+                </div>
+
+                <div class="legend">
+                  <span><i class="legend-line district-line"></i>District</span>
+                  <span><i class="legend-line state-line"></i>State</span>
+                </div>
+              </div>
+
+              <div class="chart-wrap">
+                <svg id="yieldTrendChart" viewBox="0 0 1000 360" preserveAspectRatio="none" role="img" aria-label="Historical yield trend"></svg>
+              </div>
+            </section>
+
+            <section class="panel history-panel">
+              <div class="panel-head">
+                <div>
+                  <span class="panel-code">HISTORY / DISTRICT RECORDS</span>
+                  <h2>Historical Rice Performance</h2>
+                </div>
+                <span class="panel-state neutral" id="historyPeriod">—</span>
+              </div>
+
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Year</th>
+                      <th>Area (ha)</th>
+                      <th>Production (t)</th>
+                      <th>Yield (t/ha)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="historyBody"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <div class="method-note">
+              Historical comparisons use available Kharif rice area and production records. State yield is calculated from total state production divided by total state area for the same year.
+            </div>
+          </section>
+        </section>
+
+        <div class="footnote">
+          <span>SmartFarm AI · Research prototype</span>
+          <span>Backend API available at <code>/docs</code></span>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
